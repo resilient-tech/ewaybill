@@ -4,4 +4,4 @@
 *.swp
 tags
 ewaybill/docs/current
-# .vscode/
+.vscode/
