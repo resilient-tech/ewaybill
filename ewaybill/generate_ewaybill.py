@@ -116,13 +116,16 @@ def generate_ewb_json(dt, dn):
 
 			data.itemList.append(item_data)
 
+		for attr in ['sgstValue', 'cgstValue', 'igstValue', 'cessValue']:
+			data[attr] = flt(data[attr], 2)
+			
 		disable_rounded = frappe.db.get_single_value('Global Defaults', 'disable_rounded_total')
 		data.totInvValue = doc.grand_total if disable_rounded else doc.rounded_total
 
 		if doc.distance > 4000:
 			frappe.throw(_('Distance cannot be greater than 4000 kms'))
 
-		data.transDistance = round(doc.distance)
+		data.transDistance = int(doc.distance)
 
 		transport_modes = {
 			'Road': 1,
