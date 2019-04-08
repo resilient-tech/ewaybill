@@ -323,3 +323,12 @@ def get_itemised_tax_breakup_data(doc, account_wise=False):
 			hsn_tax[hsn_code].setdefault(key, {"tax_rate": 0, "tax_amount": 0})
 			hsn_tax[hsn_code][key]["tax_rate"] = tax_detail.get("tax_rate")
 			hsn_tax[hsn_code][key]["tax_amount"] += tax_detail.get("tax_amount")
+	
+	# set taxable amount
+	hsn_taxable_amount = frappe._dict()
+	for item in itemised_taxable_amount:
+		hsn_code = item_hsn_map.get(item)
+		hsn_taxable_amount.setdefault(hsn_code, 0)
+		hsn_taxable_amount[hsn_code] += itemised_taxable_amount.get(item)
+
+	return hsn_tax, hsn_taxable_amount
