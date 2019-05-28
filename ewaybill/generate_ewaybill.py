@@ -74,6 +74,7 @@ def generate_ewb_json(dt, dn):
 			data.transType = 2
 			shipping_address = frappe.get_doc('Address', doc.shipping_address_name)
 			set_gst_state_and_state_number(shipping_address)
+			data.toPincode = validate_pincode(shipping_address.pincode, 'Shipping Address')
 			data.actualToStateCode = validate_state_code(shipping_address.gst_state_number, 'Shipping Address')
 		else:
 			data.transType = 1
@@ -118,14 +119,14 @@ def generate_ewb_json(dt, dn):
 
 		for attr in ['sgstValue', 'cgstValue', 'igstValue', 'cessValue']:
 			data[attr] = flt(data[attr], 2)
-			
+
 		disable_rounded = frappe.db.get_single_value('Global Defaults', 'disable_rounded_total')
 		data.totInvValue = doc.grand_total if disable_rounded else doc.rounded_total
 
 		if doc.distance > 4000:
 			frappe.throw(_('Distance cannot be greater than 4000 kms'))
 
-		data.transDistance = int(doc.distance)
+		data.transDistance = int(round(doc.distance))
 
 		transport_modes = {
 			'Road': 1,
@@ -326,7 +327,7 @@ def get_itemised_tax_breakup_data(doc, account_wise=False):
 			hsn_tax[hsn_code].setdefault(key, {"tax_rate": 0, "tax_amount": 0})
 			hsn_tax[hsn_code][key]["tax_rate"] = tax_detail.get("tax_rate")
 			hsn_tax[hsn_code][key]["tax_amount"] += tax_detail.get("tax_amount")
-	
+
 	# set taxable amount
 	hsn_taxable_amount = frappe._dict()
 	for item in itemised_taxable_amount:
